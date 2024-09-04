@@ -54,8 +54,6 @@ local container_sizes = {}
 for p, prototype in pairs(data.raw["container"]) do
   if p:sub(0, 9) ~= "efficient" and not blacklisted(p, prototype) then
 
-    prototype.has_efficient_container = true
-
     log("Creating container for ".. p)
 
     local size = math.abs(prototype.selection_box[1][1]) + math.abs(prototype.selection_box[2][1])

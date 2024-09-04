@@ -186,36 +186,6 @@ function update_unit(unit_data, unit_number, force)
       }
     end
 	end
-
-  -- TODO update exterior
-
-  -- -- maximum amount allowed in storage (non-inventory)
-  -- local maximum_count = (game.entity_prototypes[entity.name:sub(11,-1)].get_inventory_size(defines.inventory.chest) - #inventory) * unit_data.stack_size
-
-	-- if inventory_count > mean then
-  --   if unit_data.count < maximum_count then
-  --     -- internal buffer is not full, remove until buffer is full or until mean container capacity is reached
-  --     local amount_to_remove = inventory_count - mean
-  --     if amount_to_remove < maximum_count - unit_data.count then amount_to_remove = maximum_count - unit_data.count end
-  --     inventory.remove{name = item, count = amount_to_remove}
-  --     unit_data.count = unit_data.count + amount_to_remove
-  --     inventory_count = inventory_count - amount_to_remove
-  --     changed = true
-  --   elseif unit_data.previous_inventory_count ~= inventory_count then changed = true end
-	-- elseif inventory_count < mean then
-	-- 	if unit_data.previous_inventory_count ~= inventory_count then
-	-- 		changed = true
-	-- 	end
-	-- 	local to_add = mean - inventory_count
-	-- 	if unit_data.count < to_add then
-	-- 		to_add = unit_data.count
-	-- 	end
-	-- 	if to_add ~= 0 then
-	-- 		local amount_added = entity.insert{name = item, count = to_add}
-	-- 		unit_data.count = unit_data.count - amount_added
-	-- 		inventory_count = inventory_count + amount_added
-	-- 	end
-	-- end
 end
 
 script.on_nth_tick(15, function(event)

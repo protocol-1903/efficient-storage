@@ -188,6 +188,7 @@ function update_unit(unit_data, unit_number, force)
 	end
 end
 
+-- dynamic polling rate???
 script.on_nth_tick(15, function(event)
 	local smooth_ups = event.tick % update_slots
 	
@@ -422,7 +423,7 @@ function downgrade_event(event)
   for e, entity in pairs(event.entities) do
 
     -- if container and not already efficient storage
-    if entity.type == "constant-combinator" and is_storage_unit(entity) then
+    if entity.valid and entity.type == "constant-combinator" and is_storage_unit(entity) then
 
       unit_data = global.units[entity.unit_number]
 
@@ -432,7 +433,8 @@ function downgrade_event(event)
         force = entity.force or nil,
         player = game.get_player(event.player_index) or nil
       }
-      if unit_data.item ~= nil and unit_data.count ~= nil then
+      
+      if unit_data.count ~= nil and unit_data.count + unit_data.inventory.get_item_count() > 0 then
         container.get_inventory(defines.inventory.chest).insert{name = unit_data.item, count = unit_data.count + unit_data.inventory.get_item_count()}
       end
 

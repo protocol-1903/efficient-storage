@@ -159,16 +159,16 @@ data:extend{ -- TODO selection tool to upgrade and downgrade containers
 
 -- TODO
 
--- new image for selection tool
--- get localization working properly
--- fix not being able to manually remove units    DONE
--- check if biters can destroy units              DONE
--- mod compatability testing
--- MULTI ITEM STORAGE
--- fix bug with invalid storage (weird)
--- benchmark mod compared to normal storage
--- find beta testers
--- fix not being able to deconstruct storage units
--- check if robots can place/remove
--- fix containers not making smoke when upgrade planner is used
--- loader functionality
+-- new image for selection tool                                       nd
+-- get localization working properly                                  nd
+-- fix not being able to manually remove units                        DONE
+-- check if biters can destroy units                                  DONE
+-- mod compatability testing                                          nd
+-- MULTI ITEM STORAGE                                                 nd
+-- fix bug with invalid storage (weird)                               nd
+-- benchmark mod compared to normal storage                           nd
+-- find beta testers                                                  nd
+-- fix not being able to deconstruct storage units                    DONE
+-- check if robots can place/remove                                   nd
+-- fix containers not making smoke when upgrade planner is used       DONE
+-- loader functionality                                               DONE

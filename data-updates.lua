@@ -1,4 +1,4 @@
-require "gui-styles"
+-- require "gui-styles"
 
 local circuit_wire_connection_points = {
 	green = {0.25, -0.15},
@@ -28,7 +28,12 @@ function blacklisted(p, prototype)
     "logo",
     "wreck",
     "crash",
-    "dummy"
+    "dummy",
+    "red-chest",
+    "blue-chest",
+    "dino-dig-site",
+    "aerial-base",
+    "ipod" -- ??? what the heck py ???
   }
   for _, check in pairs(blacklist) do
     if string.find(p, check) then
@@ -54,16 +59,14 @@ local container_sizes = {}
 for p, prototype in pairs(data.raw["container"]) do
   if p:sub(0, 9) ~= "efficient" and not blacklisted(p, prototype) then
 
-    prototype.has_efficient_container = true
-
     log("Creating container for ".. p)
 
-    local size = math.abs(prototype.selection_box[1][1]) + math.abs(prototype.selection_box[2][1])
-
-    if size == nil then
+    if not prototype.selection_box then
       log("ERROR: container has no selection_box")
-      size = 1
+      goto endof
     end
+
+    local size = math.abs(prototype.selection_box[1][1]) + math.abs(prototype.selection_box[2][1])
 
     container_sizes[size] = container_sizes[size] and container_sizes[size] + 1 or 1
 
@@ -82,13 +85,14 @@ for p, prototype in pairs(data.raw["container"]) do
           collision_box = prototype.collision_box,
           selection_box = prototype.selection_box,
           max_health = prototype.max_health,
-          flags = {"placeable-player", "not-flammable", "not-rotatable", "hide-alt-info"},
-          icon = prototype.icon,
-          icon_size = prototype.icon_size,
-          icon_mipmaps = prototype.icon_mipmaps,
+          flags = {"placeable-neutral", "player-creation", "not-flammable", "not-rotatable", "hide-alt-info"},
+          icon = prototype.icon or nil,
+          icon_size = prototype.icon_size or nil,
+          icons = prototype.icons,
+          icon_mipmaps = prototype.icon_mipmaps or nil,
           item_slot_count = 1,
           collision_mask = prototype.collision_mask,
-          remove_decoratives = "false",
+          remove_decoratives = "true",
           sprites = prototype.picture, -- TODO figure out sprite placement for the ciruit wires
           activity_led_sprites = nothing, -- TODO add the circuit connection sprite to the containers (based on setting?)
           activity_led_light_offsets = {{0, 0}, {0, 0}, {0, 0}, {0, 0}},
@@ -98,6 +102,8 @@ for p, prototype in pairs(data.raw["container"]) do
         }
       }
     end
+
+    ::endof::
   end
 end
 
@@ -108,7 +114,8 @@ for size, count in pairs(container_sizes) do
       type = "container",
       name = "efficient-container-size-" .. math.ceil(size),
       selection_box = {{-size/2, -size/2}, {size/2, size/2}},
-      collision_box = {{0, 0}, {0, 0}},
+      collision_box = {{-size/2, -size/2}, {size/2, size/2}},
+      collision_mask = {"item-layer", "object-layer"},
       inventory_size = 2,
       enable_inventory_bar = false,
       inventory_type = "with_filters_and_bar",
@@ -117,7 +124,7 @@ for size, count in pairs(container_sizes) do
       icon_mipmaps = nil, 
       picture = nothing,
       scale_info_icons = false,
-      flags = {"placeable-neutral", "not-deconstructable", "not-flammable", "not-upgradable", "not-rotatable", "placeable-off-grid"},
+      flags = {"placeable-neutral", "not-flammable", "not-upgradable"},
       placeable_by = {item = "inventory-shrinker", count = 0}
     }
   }
@@ -137,8 +144,8 @@ data:extend{ -- TODO selection tool to upgrade and downgrade containers
       "same-force",
       "entity-with-force"
     },
-    selection_color = {0, 1, 0, 1},
-    alt_selection_color = {0, 1, 0, 1},
+    selection_color = {0, 0.8, 0, 1},
+    alt_selection_color = {0, 0.8, 0.8, 1},
     reverse_selection_color = {1, 0, 0, 1},
     selection_cursor_box_type = "entity",
     alt_selection_cursor_box_type = "entity",
@@ -163,3 +170,5 @@ data:extend{ -- TODO selection tool to upgrade and downgrade containers
 -- find beta testers
 -- fix not being able to deconstruct storage units
 -- check if robots can place/remove
+-- fix containers not making smoke when upgrade planner is used
+-- loader functionality

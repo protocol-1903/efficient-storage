@@ -1,4 +1,18 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.1.1
+Date: ????
+  Modding:
+    - Added pymods compatability (you're welcome, Goats)
+  Changes:
+    - Removed testing code and unused files
+    - Alt selection has a new color (ooohhhhh fancy) but is completely useless
+  Bugfixes:
+    - Loaders are now functional
+    - Smoke is created when the upgrade tool is used
+    - Game no longer crashes when downgrading a container that has a filter but no items
+    - Prevented game from crashing when a container has no selection box
+    - Game no longer crashes in data stage (different from previous)
+---------------------------------------------------------------------------------------------------
 Version: 0.1.0
 Date: 2024-09-04
   Features:

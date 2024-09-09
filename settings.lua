@@ -1,8 +1,0 @@
--- data:extend{{
--- 	type = "int-setting",
--- 	name = "unit-storage-slots",
--- 	setting_type = "runtime-global",
--- 	default_value = "2",
---   minimum_value = "2",
---   maximum_value = "5"
--- }}

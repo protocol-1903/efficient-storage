@@ -1,6 +1,6 @@
 {
 	"name": "efficient-storage",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"title": "Efficient Storage",
 	"author": "protocol_1903",
 	"description": "An alternative to UPS-intensive warehouses. Desinged as a more \"vanilla\" alternative to Memory Storage.",

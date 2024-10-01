@@ -124,56 +124,7 @@ for size, count in pairs(container_sizes) do
       icon_mipmaps = nil, 
       picture = nothing,
       scale_info_icons = false,
-      flags = {"placeable-neutral", "not-flammable", "not-upgradable"},
-      placeable_by = {item = "inventory-shrinker", count = 0}
+      flags = {"placeable-neutral", "player-creation", "not-deconstructable", "not-flammable", "not-upgradable"}
     }
   }
 end
-
-data:extend{ -- TODO selection tool to upgrade and downgrade containers
-  {
-    type = "selection-tool",
-    name = "inventory-shrinker",
-    selection_mode = {
-      "buildable-type",
-      "same-force",
-      "entity-with-force"
-    },
-    alt_selection_mode = {
-      "buildable-type",
-      "same-force",
-      "entity-with-force"
-    },
-    selection_color = {0, 0.8, 0, 1},
-    alt_selection_color = {0, 0.8, 0.8, 1},
-    reverse_selection_color = {1, 0, 0, 1},
-    selection_cursor_box_type = "entity",
-    alt_selection_cursor_box_type = "entity",
-    stack_size = 1,
-    icon = "__efficient-storage__/graphics/icon/storage-unit.png",
-    icon_size = 64,
-    icon_mipmaps = 4,
-  }
-}
-
-
--- smaller todo
-
--- fix not being able to manually remove units                        DONE
--- check if biters can destroy units                                  DONE
--- fix not being able to deconstruct storage units                    DONE
--- fix containers not making smoke when upgrade planner is used       DONE
--- loader functionality                                               DONE
--- new image for selection tool                                       nd
--- get localization working properly                                  nd
--- mod compatability testing                                          nd
--- fix bug with invalid storage (weird)                               nd
--- benchmark mod compared to normal storage                           nd
--- find beta testers                                                  nd
--- check if robots can place/remove                                   nd
-
--- BIGGER TODO
-
--- dynamic polling rate                                               nd
--- optimize internal logic (fewer operations)                         nd
--- multi-item storage                                                 nd

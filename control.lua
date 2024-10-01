@@ -341,12 +341,40 @@ end
 -- register event to script handler
 script.on_event(defines.events.on_pre_player_mined_item, pre_mined, {{filter = "type", type = "constant-combinator"}})
 script.on_event(defines.events.on_robot_pre_mined, pre_mined, {{filter = "type", type = "constant-combinator"}})
-script.on_event(defines.events.on_marked_for_deconstruction, pre_mined, {{filter = "type", type = "constant-combinator"}})
+
+--------------------------------------------------------------------------------------------------- deconstruction planner
+script.on_event(defines.events.on_marked_for_deconstruction, function(event)
+  -- if container and not already efficient storage
+  if event.entity.valid and event.entity.type == "constant-combinator" and is_storage_unit(event.entity) then
+
+    unit_data = global.units[event.entity.unit_number]
+
+    local container = event.entity.surface.create_entity{
+      name = event.entity.name:sub(11, -12),
+      position = event.entity.position,
+      force = event.entity.force or nil,
+      player = game.get_player(event.player_index) or nil
+    }
+    -- if container is nil
+    if container == nil then error("tried to create normal container but got nil (deconstruction event)") end
+
+    if unit_data.count ~= nil and unit_data.count + unit_data.inventory.get_item_count() > 0 then
+      container.get_inventory(defines.inventory.chest).insert{name = unit_data.item, count = unit_data.count + unit_data.inventory.get_item_count()}
+    end
+    container.order_deconstruction(event.entity.force or nil, game.get_player(event.player_index) or nil)
+
+    local unit_number = unit_data.combinator.unit_number
+
+    unit_data.container.destroy()
+    unit_data.combinator.destroy()
+    global.units[unit_number] = nil
+  end
+end, {{filter = "type", type = "constant-combinator"}})
 
 ------------------------------------------------------------------------------------------------- upgrade planner
 script.on_event(defines.events.on_player_selected_area, function(event)
   -- if not correct tool, end
-  if event.item ~= "inventory-shrinker" then return end
+  if event.item ~= "container-shrinker" then return end
 
   -- for each entity in selection
   for e, entity in pairs(event.entities) do
@@ -387,6 +415,8 @@ script.on_event(defines.events.on_player_selected_area, function(event)
           player = player,
           force = force
         }
+        -- if container is nil
+        if container == nil then error("tried to create efficient container but got nil (upgrade event)") end
         container.operable = false
         container.destructible = false
 
@@ -417,7 +447,7 @@ end)
 ------------------------------------------------------------------------------------------------- downgrade planner
 function downgrade_event(event)
   -- if not correct tool, end
-  if event.item ~= "inventory-shrinker" then return end
+  if event.item ~= "container-shrinker" then return end
 
   -- for each entity in selection
   for e, entity in pairs(event.entities) do
@@ -433,6 +463,8 @@ function downgrade_event(event)
         force = entity.force or nil,
         player = game.get_player(event.player_index) or nil
       }
+      -- if container is nil
+      if container == nil then error("tried to create normal container but got nil (downgrade event)") end
       
       if unit_data.count ~= nil and unit_data.count + unit_data.inventory.get_item_count() > 0 then
         container.get_inventory(defines.inventory.chest).insert{name = unit_data.item, count = unit_data.count + unit_data.inventory.get_item_count()}

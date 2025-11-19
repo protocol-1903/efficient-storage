@@ -1,22 +1,3 @@
--- require "gui-styles"
-
-local circuit_wire_connection_points = {
-	green = {0.25, -0.15},
-	red = {-0.15, 0.1}
-}
-
-circuit_wire_connection_points = {
-	shadow = circuit_wire_connection_points,
-	wire = circuit_wire_connection_points
-}
-
-circuit_wire_connection_points = {
-	circuit_wire_connection_points,
-	circuit_wire_connection_points,
-	circuit_wire_connection_points,
-	circuit_wire_connection_points
-}
-
 local nothing = {
 	filename = "__efficient-storage__/graphics/entity/nothing.png",
 	priority = "extra-high",
@@ -55,6 +36,7 @@ end
 -- then whneever you insert an item just check it against the proper container size to see if it is getting full
 
 local container_sizes = {}
+local containers, combinators = {}, {}
 
 for p, prototype in pairs(data.raw["container"]) do
   if p:sub(0, 9) ~= "efficient" and not blacklisted(p, prototype) then
@@ -66,26 +48,30 @@ for p, prototype in pairs(data.raw["container"]) do
       goto endof
     end
 
-    local size = math.abs(prototype.selection_box[1][1]) + math.abs(prototype.selection_box[2][1])
+    local size = math.abs(prototype.selection_box[1][1] - prototype.selection_box[2][1])
 
     container_sizes[size] = container_sizes[size] and container_sizes[size] + 1 or 1
 
     -- If the placeable_by item exists
     if data.raw.item[p] ~= nil then
+      -- add container and combinator to whitelist for selection tool
+      combinators[#combinators+1] = "efficient-" .. p .. "-combinator"
+      containers[#containers+1] = p
       -- TODO upgrade case (upgrading wood to iron, etc)
-      data:extend{
+      data:extend {
         {
           name = "efficient-" .. p .. "-combinator",
           subgroup = "storage",
           localised_name = {"entity-name.combinator", {"entity-name." .. p}},
           localised_description = {"entity-description." .. p},
           type = "constant-combinator",
-          circuit_wire_connection_points = {prototype.circuit_wire_connection_point, prototype.circuit_wire_connection_point, prototype.circuit_wire_connection_point, prototype.circuit_wire_connection_point},
+          circuit_wire_connection_points = {prototype.circuit_connector.points, prototype.circuit_connector.points, prototype.circuit_connector.points, prototype.circuit_connector.points},
           circuit_wire_max_distance = prototype.circuit_wire_max_distance,
           collision_box = prototype.collision_box,
           selection_box = prototype.selection_box,
           max_health = prototype.max_health,
           flags = {"placeable-neutral", "player-creation", "not-flammable", "not-rotatable", "hide-alt-info"},
+          frozen_patch = prototype.frozen_patch,
           icon = prototype.icon or nil,
           icon_size = prototype.icon_size or nil,
           icons = prototype.icons,
@@ -109,14 +95,14 @@ end
 
 -- TODO create containers based on the sizes
 for size, count in pairs(container_sizes) do
-  data:extend{
-    {
+  data:extend {
+    { -- TODO allow container to connect to circuit network
       type = "container",
       name = "efficient-container-size-" .. math.ceil(size),
       selection_box = {{-size/2, -size/2}, {size/2, size/2}},
       collision_box = {{-size/2, -size/2}, {size/2, size/2}},
-      collision_mask = {"item-layer", "object-layer"},
-      inventory_size = 2,
+      collision_mask = { layers = {} },
+      inventory_size = 12,
       enable_inventory_bar = false,
       inventory_type = "with_filters_and_bar",
       icon = "__efficient-storage__/graphics/entity/nothing.png",
@@ -124,7 +110,70 @@ for size, count in pairs(container_sizes) do
       icon_mipmaps = nil, 
       picture = nothing,
       scale_info_icons = false,
-      flags = {"placeable-neutral", "player-creation", "not-deconstructable", "not-flammable", "not-upgradable"}
+      flags = {"placeable-neutral", "player-creation", "not-deconstructable", "not-flammable", "not-upgradable", "not-selectable-in-game"}
     }
   }
 end
+
+data:extend { -- TODO selection tool to upgrade and downgrade containers
+  {
+    type = "selection-tool",
+    name = "container-shrinker",
+    select = {
+      border_color = {0, 0.8, 0, 1},
+      cursor_box_type = "entity",
+      entity_filters = containers,
+      mode = {
+        "buildable-type",
+        "same-force"
+      }
+    },
+    alt_select = {
+      border_color = {0, 0.8, 0.8, 1},
+      cursor_box_type = "entity",
+      entity_filters = containers,
+      mode = {
+        "buildable-type",
+        "same-force"
+      }
+    },
+    reverse_select = {
+      border_color = {1, 0, 0, 1},
+      cursor_box_type = "entity",
+      entity_filters = combinators,
+      mode = {
+        "buildable-type",
+        "same-force"
+      }
+    },
+    alt_reverse_select = {
+      border_color = {1, 0, 0, 1},
+      cursor_box_type = "entity",
+      entity_filters = combinators,
+      mode = {
+        "buildable-type",
+        "same-force"
+      }
+    },
+    stack_size = 1,
+    icon = "__efficient-storage__/graphics/icon/icon.png",
+    icon_size = 64,
+    flags = { "spawnable", "only-in-cursor", "not-stackable" }
+  },
+  {
+    type = "shortcut",
+    name = "give-container-shrinker",
+    action = "spawn-item",
+    associated_control_input = "give-container-shrinker",
+    item_to_spawn = "container-shrinker",
+    icon = data.raw["upgrade-item"]["upgrade-planner"].icon,
+    small_icon = data.raw["upgrade-item"]["upgrade-planner"].icon
+  },
+  {
+    type = "custom-input",
+    name = "give-container-shrinker",
+    key_sequence = "ALT + S",
+    action = "spawn-item",
+    item_to_spawn = "container-shrinker"
+  }
+}
